@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>CS144:Lab-1 | 大风起兮的博客</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="计算机网络," />
+  
+
+  <meta name="description" content="CS144:Lab-1 预览TCP协议保证可靠传输，但是网络只能尽力传送，为了解决二者之间的矛盾，我们需要做一些工作。这些工作可以使我们达到我们的目标。 接下来的几个实验的大致功能：  lab1:完成数据的组装，使无序的字节流变为有序 lab2:实现TCP的接收端 lab3:实现TCP发送端 lab4:实现TCP的连接   准备工作 git fetch git merge origin&#x2F;lab1-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CS144:Lab-1">
+<meta property="og:url" content="http://yoursite.com/2020/12/18/CS144Lab-1/index.html">
+<meta property="og:site_name" content="大风起兮的博客">
+<meta property="og:description" content="CS144:Lab-1 预览TCP协议保证可靠传输，但是网络只能尽力传送，为了解决二者之间的矛盾，我们需要做一些工作。这些工作可以使我们达到我们的目标。 接下来的几个实验的大致功能：  lab1:完成数据的组装，使无序的字节流变为有序 lab2:实现TCP的接收端 lab3:实现TCP发送端 lab4:实现TCP的连接   准备工作 git fetch git merge origin&#x2F;lab1-">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-12-18T04:59:14.000Z">
+<meta property="article:modified_time" content="2020-12-18T05:03:24.807Z">
+<meta property="article:author" content="大风起兮">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+
+  
+
+  
+    <link rel="icon" href="/images/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-38189205-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.2.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            主页
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#CS144-Lab-1"><span class="toc-text">CS144:Lab-1</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%84%E8%A7%88"><span class="toc-text">预览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9C%80%E8%A6%81%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%8E%A5%E5%8F%A3"><span class="toc-text">需要实现的接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#stream-reassembler-hh"><span class="toc-text">stream_reassembler.hh</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#stream-reassembler-cc"><span class="toc-text">stream_reassembler.cc</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">遇到的问题</span></a></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-CS144Lab-1" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">CS144:Lab-1</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2020.12.18</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>大风起兮</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="CS144-Lab-1"><a href="#CS144-Lab-1" class="headerlink" title="CS144:Lab-1"></a>CS144:Lab-1</h1><hr>
+<h2 id="预览"><a href="#预览" class="headerlink" title="预览"></a>预览</h2><p>TCP协议保证可靠传输，但是网络只能尽力传送，为了解决二者之间的矛盾，我们需要做一些工作。这些工作可以使我们达到我们的目标。</p>
+<p>接下来的几个实验的大致功能：</p>
+<ul>
+<li>lab1:完成数据的组装，使无序的字节流变为有序</li>
+<li>lab2:实现TCP的接收端</li>
+<li>lab3:实现TCP发送端</li>
+<li>lab4:实现TCP的连接</li>
+</ul>
+<hr>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><ul>
+<li>git fetch</li>
+<li>git merge origin/lab1-startercode</li>
+<li>make</li>
+</ul>
+<p>补全libsponge下面的 <strong><em>stream_reassembler.hh</em></strong> 和 <strong><em>stream_reassembler.cc</em></strong> 文件。</p>
+<hr>
+<h2 id="需要实现的接口"><a href="#需要实现的接口" class="headerlink" title="需要实现的接口"></a>需要实现的接口</h2><p>需要实现的接口如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Construct a `StreamReassembler` that will store up to `capacity` bytes.</span></span><br><span class="line">StreamReassembler(<span class="keyword">const</span> <span class="keyword">size_t</span> capacity);</span><br><span class="line"><span class="comment">// Receive a substring and write any newly contiguous bytes into the stream.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// `data`: the segment</span></span><br><span class="line"><span class="comment">// `index` indicates the index (place in sequence) of the first byte in `data`</span></span><br><span class="line"><span class="comment">// `eof`: the last byte of this segment is the last byte in the entire stream</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">push_substring</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span> &amp;data, <span class="keyword">const</span> <span class="keyword">uint64_t</span> index, <span class="keyword">const</span> <span class="keyword">bool</span> eof)</span></span>;</span><br><span class="line"><span class="comment">// Access the reassembled byte stream</span></span><br><span class="line"><span class="function">ByteStream &amp;<span class="title">stream_out</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">// The number of bytes in the substrings stored but not yet reassembled</span></span><br><span class="line"><span class="function"><span class="keyword">size_t</span> <span class="title">unassembled_bytes</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="comment">// Is the internal state empty (other than the output stream)?</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>翻译一下就是：</p>
+<ul>
+<li><code>StreamReassembler(const size_t capacity)</code>：构造函数，capacity为容量<strong>。注意：这里的容量是指数据流缓冲区的大小，而不是该StreamReassembler所能够使用的内存大小（我因为理解题意出错而考虑得特别复杂，导致始终有三个点无法通过）。</strong>实际上，StreamReassembler内部自定义的数据结构可以使用的空间没有限制。</li>
+<li><code>void push_substring(const string &amp;data, const uint64_t index, const bool eof)</code>：这是最关键的函数，完成写入操作。<strong>需要考虑三种情况：不相交，相交，覆盖。</strong></li>
+<li><code>size_t unassembled_bytes() const</code>：还没有被组装的字节个数，如果同一位置的字节发送了多次，那么算作一次。</li>
+<li><code>bool empty() const</code>：是否完成。</li>
+</ul>
+<hr>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><p>优先队列的使用可以参考：<a target="_blank" rel="noopener" href="https://salvete.gitee.io/2020/08/07/STL%E7%BB%93%E6%9E%84%E4%BD%93%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97%E7%9A%84%E4%BD%BF%E7%94%A8/">优先队列的使用</a></p>
+<h3 id="stream-reassembler-hh"><a href="#stream-reassembler-hh" class="headerlink" title="stream_reassembler.hh"></a>stream_reassembler.hh</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//自定义类，代表数据片段</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Piece</span>&#123;</span></span><br><span class="line">	<span class="keyword">private</span>:</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">string</span> data;</span><br><span class="line">		<span class="keyword">uint64_t</span> index;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span>:</span><br><span class="line">		Piece(<span class="built_in">std</span>::<span class="built_in">string</span> dt, <span class="keyword">uint64_t</span> idx);</span><br><span class="line">		<span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">get_data</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">		<span class="function"><span class="keyword">uint64_t</span> <span class="title">get_index</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">		<span class="keyword">bool</span> <span class="keyword">operator</span> &lt; (Piece piece) <span class="keyword">const</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StreamReassembler</span> &#123;</span></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">// Your code here -- add private members as necessary.</span></span><br><span class="line">    ByteStream _output;  <span class="comment">//!&lt; The reassembled in-order byte stream</span></span><br><span class="line">    <span class="keyword">size_t</span> _capacity;    <span class="comment">//!&lt; The maximum number of bytes</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//代表接受但是还没有被组装的数据片段优先队列</span></span><br><span class="line">	<span class="built_in">priority_queue</span>&lt;Piece, <span class="built_in">vector</span>&lt;Piece&gt; &gt;pieces;</span><br><span class="line">    <span class="comment">//已经完成组装的字节数</span></span><br><span class="line">	<span class="keyword">size_t</span> assembled_num;</span><br><span class="line">    <span class="comment">//总共的字节数</span></span><br><span class="line">	<span class="keyword">size_t</span> total_num;</span><br><span class="line">    <span class="comment">//是否接受过带eof的片段</span></span><br><span class="line">	<span class="keyword">bool</span> eof_occured;</span><br><span class="line">    <span class="comment">//是否组装完成</span></span><br><span class="line">	<span class="keyword">bool</span> _eof;</span><br><span class="line">    <span class="comment">//没有被组装但是接收了的字节和它出现的次数</span></span><br><span class="line">    <span class="built_in">map</span>&lt;<span class="keyword">int</span>,<span class="keyword">int</span>&gt; unassembled;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.</span></span><br><span class="line">    <span class="comment">//! \note This capacity limits both the bytes that have been reassembled,</span></span><br><span class="line">    <span class="comment">//! and those that have not yet been reassembled.</span></span><br><span class="line">    StreamReassembler(<span class="keyword">const</span> <span class="keyword">size_t</span> capacity);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief Receive a substring and write any newly contiguous bytes into the stream.</span></span><br><span class="line">    <span class="comment">//!</span></span><br><span class="line">    <span class="comment">//! The StreamReassembler will stay within the memory limits of the `capacity`.</span></span><br><span class="line">    <span class="comment">//! Bytes that would exceed the capacity are silently discarded.</span></span><br><span class="line">    <span class="comment">//!</span></span><br><span class="line">    <span class="comment">//! \param data the substring</span></span><br><span class="line">    <span class="comment">//! \param index indicates the index (place in sequence) of the first byte in `data`</span></span><br><span class="line">    <span class="comment">//! \param eof the last byte of `data` will be the last byte in the entire stream</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">push_substring</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;data, <span class="keyword">const</span> <span class="keyword">uint64_t</span> index, <span class="keyword">const</span> <span class="keyword">bool</span> eof)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \name Access the reassembled byte stream</span></span><br><span class="line">    <span class="comment">//!@&#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">const</span> ByteStream &amp;<span class="title">stream_out</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _output; &#125;</span><br><span class="line">    <span class="function">ByteStream &amp;<span class="title">stream_out</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> _output; &#125;</span><br><span class="line">    <span class="comment">//!@&#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//! The number of bytes in the substrings stored but not yet reassembled</span></span><br><span class="line">    <span class="comment">//!</span></span><br><span class="line">    <span class="comment">//! \note If the byte at a particular index has been pushed more than once, it</span></span><br><span class="line">    <span class="comment">//! should only be counted once for the purpose of this function.</span></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">unassembled_bytes</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//! \brief Is the internal state empty (other than the output stream)?</span></span><br><span class="line">    <span class="comment">//! \returns `true` if no substrings are waiting to be assembled</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="stream-reassembler-cc"><a href="#stream-reassembler-cc" class="headerlink" title="stream_reassembler.cc"></a>stream_reassembler.cc</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">///////////////////////////////////////////////////////////////</span></span><br><span class="line"><span class="comment">//****** Piece **********************</span></span><br><span class="line"></span><br><span class="line">Piece::Piece(<span class="built_in">std</span>::<span class="built_in">string</span> dt, <span class="keyword">uint64_t</span> idx):data(dt),index(idx)&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="built_in">std</span>::<span class="built_in">string</span> <span class="title">Piece::get_data</span><span class="params">()</span> <span class="keyword">const</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">uint64_t</span> <span class="title">Piece::get_index</span><span class="params">()</span> <span class="keyword">const</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> index;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//重载&lt;运算符</span></span><br><span class="line"><span class="keyword">bool</span> Piece::<span class="keyword">operator</span> &lt; (Piece piece) <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> index &gt; piece.index;	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/////////////////////////////////////////////</span></span><br><span class="line"><span class="comment">// **************StreamReassembler***********</span></span><br><span class="line"><span class="comment">/////////////////////////////////////////////</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">StreamReassembler::StreamReassembler(<span class="keyword">const</span> <span class="keyword">size_t</span> capacity) : _output(capacity), _capacity(capacity),pieces(<span class="built_in">priority_queue</span>&lt;Piece,<span class="built_in">vector</span>&lt;Piece&gt; &gt;()), assembled_num(<span class="number">0</span>),total_num(<span class="number">0</span>),eof_occured(<span class="literal">false</span>),_eof(<span class="literal">false</span>),unassembled(<span class="built_in">map</span>&lt;<span class="keyword">int</span>,<span class="keyword">int</span>&gt;())&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//! \details This function accepts a substring (aka a segment) of bytes,</span></span><br><span class="line"><span class="comment">//! possibly out-of-order, from the logical stream, and assembles any newly</span></span><br><span class="line"><span class="comment">//! contiguous substrings and writes them into the output stream in order.</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">StreamReassembler::push_substring</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span> &amp;data, <span class="keyword">const</span> <span class="keyword">size_t</span> index, <span class="keyword">const</span> <span class="keyword">bool</span> eof)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">Piece <span class="title">cur</span><span class="params">(data,index)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//eof出现，计算总共需要组装的字节数</span></span><br><span class="line">    <span class="keyword">if</span> (eof)</span><br><span class="line">    &#123;</span><br><span class="line">        eof_occured = <span class="literal">true</span>;</span><br><span class="line">        total_num = index + data.size();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pieces.push(cur);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//统计未组装信息</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = index; i &lt; index + data.size(); ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (unassembled.count(i))</span><br><span class="line">            unassembled[i] ++;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            unassembled[i] = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//查看现在接收的数据片段是否有符合要求的</span></span><br><span class="line">    <span class="keyword">while</span> (!pieces.empty() &amp;&amp; !_eof)</span><br><span class="line">    &#123;</span><br><span class="line">        Piece tmp = pieces.top();</span><br><span class="line">    </span><br><span class="line">        <span class="comment">//相交或覆盖的情况</span></span><br><span class="line">        <span class="keyword">if</span> (assembled_num &gt;= tmp.get_index())</span><br><span class="line">        &#123;</span><br><span class="line">               pieces.pop();</span><br><span class="line">				<span class="comment">//更新未组装信息</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">size_t</span> i = tmp.get_index(); i &lt; tmp.get_index() + tmp.get_data().size(); ++i)</span><br><span class="line">                &#123;</span><br><span class="line">                    unassembled[i] --;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (unassembled[i] == <span class="number">0</span>)</span><br><span class="line">                        unassembled.erase(i);</span><br><span class="line">                &#125;</span><br><span class="line">				</span><br><span class="line">            	<span class="comment">//如果覆盖，则直接跳过</span></span><br><span class="line">               <span class="keyword">if</span> (assembled_num &gt; (tmp.get_index() + tmp.get_data().size()))</span><br><span class="line">                   <span class="keyword">continue</span>;</span><br><span class="line">              	<span class="comment">//相交的情况</span></span><br><span class="line">            	<span class="keyword">else</span></span><br><span class="line">               &#123;</span><br><span class="line">                   <span class="keyword">size_t</span> delta = assembled_num - tmp.get_index();</span><br><span class="line">                   <span class="built_in">string</span> write_data = tmp.get_data().substr(delta,tmp.get_data().size()-delta);</span><br><span class="line">                   <span class="keyword">size_t</span> write_len = _output.write(write_data);</span><br><span class="line">                   assembled_num += write_len;</span><br><span class="line"></span><br><span class="line">        		   <span class="keyword">if</span> (eof_occured &amp;&amp; assembled_num == total_num)</span><br><span class="line">       			   &#123;</span><br><span class="line">       				      _output.end_input();</span><br><span class="line">       				      _eof = <span class="literal">true</span>;</span><br><span class="line">       				      unassembled.clear();</span><br><span class="line">       			  &#125;</span><br><span class="line"></span><br><span class="line">               &#125;</span><br><span class="line">        &#125;<span class="comment">//不相交的情况</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回未组装信息</span></span><br><span class="line"><span class="function"><span class="keyword">size_t</span> <span class="title">StreamReassembler::unassembled_bytes</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; </span><br><span class="line">        <span class="keyword">return</span> unassembled.size();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//返回是否结束</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">StreamReassembler::empty</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> _eof;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>执行结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">Test project &#x2F;home&#x2F;cs144&#x2F;sponge&#x2F;build</span><br><span class="line">      Start 15: t_strm_reassem_single</span><br><span class="line"> 1&#x2F;16 Test #15: t_strm_reassem_single ............   Passed    0.00 sec</span><br><span class="line">      Start 16: t_strm_reassem_seq</span><br><span class="line"> 2&#x2F;16 Test #16: t_strm_reassem_seq ...............   Passed    0.00 sec</span><br><span class="line">      Start 17: t_strm_reassem_dup</span><br><span class="line"> 3&#x2F;16 Test #17: t_strm_reassem_dup ...............   Passed    0.01 sec</span><br><span class="line">      Start 18: t_strm_reassem_holes</span><br><span class="line"> 4&#x2F;16 Test #18: t_strm_reassem_holes .............   Passed    0.00 sec</span><br><span class="line">      Start 19: t_strm_reassem_many</span><br><span class="line"> 5&#x2F;16 Test #19: t_strm_reassem_many ..............   Passed    2.05 sec</span><br><span class="line">      Start 20: t_strm_reassem_overlapping</span><br><span class="line"> 6&#x2F;16 Test #20: t_strm_reassem_overlapping .......   Passed    0.00 sec</span><br><span class="line">      Start 21: t_strm_reassem_win</span><br><span class="line"> 7&#x2F;16 Test #21: t_strm_reassem_win ...............   Passed    2.84 sec</span><br><span class="line">      Start 22: t_strm_reassem_cap</span><br><span class="line"> 8&#x2F;16 Test #22: t_strm_reassem_cap ...............   Passed    0.24 sec</span><br><span class="line">      Start 23: t_byte_stream_construction</span><br><span class="line"> 9&#x2F;16 Test #23: t_byte_stream_construction .......   Passed    0.00 sec</span><br><span class="line">      Start 24: t_byte_stream_one_write</span><br><span class="line">10&#x2F;16 Test #24: t_byte_stream_one_write ..........   Passed    0.00 sec</span><br><span class="line">      Start 25: t_byte_stream_two_writes</span><br><span class="line">11&#x2F;16 Test #25: t_byte_stream_two_writes .........   Passed    0.00 sec</span><br><span class="line">      Start 26: t_byte_stream_capacity</span><br><span class="line">12&#x2F;16 Test #26: t_byte_stream_capacity ...........   Passed    0.78 sec</span><br><span class="line">      Start 27: t_byte_stream_many_writes</span><br><span class="line">13&#x2F;16 Test #27: t_byte_stream_many_writes ........   Passed    0.01 sec</span><br><span class="line">      Start 50: t_address_dt</span><br><span class="line">14&#x2F;16 Test #50: t_address_dt .....................   Passed    0.03 sec</span><br><span class="line">      Start 51: t_parser_dt</span><br><span class="line">15&#x2F;16 Test #51: t_parser_dt ......................   Passed    0.00 sec</span><br><span class="line">      Start 52: t_socket_dt</span><br><span class="line">16&#x2F;16 Test #52: t_socket_dt ......................   Passed    0.00 sec</span><br><span class="line"></span><br><span class="line">100% tests passed, 0 tests failed out of 16</span><br><span class="line"></span><br><span class="line">Total Test time (real) &#x3D;   6.03 sec</span><br><span class="line">[100%] Built target check_lab1</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><ul>
+<li>未充分理解题意，导致问题复杂化。</li>
+<li>判断完成的条件是eof片段出现并且组装数等于总数，如果不判断eof片段出现，那么遇到这种情况会出错：<code>push_substring(“”,0,false)</code>。此时<code>assembled_num == total_num</code>,但是并没有结束。</li>
+<li>判断覆盖的时候，应该使用<code>&gt;</code>而不是<code>&gt;=</code>。当然可以通过添加其他判断条件解决，这只是一种解决方式。</li>
+</ul>
+<p>至此，实验一完成。</p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2020/12/16/CS144Lab-0/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="hide pull-right" href="/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              主页
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
