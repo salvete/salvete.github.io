@@ -15,12 +15,12 @@
     <meta name="keywords" content="Linux Admin," />
   
 
-  <meta name="description" content="Process ManagementBasic Process Management $$ — 当期那进程PID $PPID — 父进程PID ps fx:查看当前bash的进程树 ps fax:查看整个系统进程树 pgrep 查看进程ID  Background jobs jobs:查看后台运行进程 fg:将后台进程转换到前台运行 bg:运行后台挂起进程，例如bg 1，运行后台第一个进程">
+  <meta name="description" content="Process Management Basic Process Management  $$ — 当期那进程PID $PPID — 父进程PID ps fx:查看当前bash的进程树 ps fax:查看整个系统进程树 pgrep 查看进程ID  Background jobs  jobs:查看后台运行进程 fg:将后台进程转换到前台运行 bg:运行后台挂起进程，例如bg">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux System Administration Process">
 <meta property="og:url" content="http://yoursite.com/2020/05/12/Linux-System-Administration_Process/index.html">
 <meta property="og:site_name" content="大风起兮的博客">
-<meta property="og:description" content="Process ManagementBasic Process Management $$ — 当期那进程PID $PPID — 父进程PID ps fx:查看当前bash的进程树 ps fax:查看整个系统进程树 pgrep 查看进程ID  Background jobs jobs:查看后台运行进程 fg:将后台进程转换到前台运行 bg:运行后台挂起进程，例如bg 1，运行后台第一个进程">
+<meta property="og:description" content="Process Management Basic Process Management  $$ — 当期那进程PID $PPID — 父进程PID ps fx:查看当前bash的进程树 ps fax:查看整个系统进程树 pgrep 查看进程ID  Background jobs  jobs:查看后台运行进程 fg:将后台进程转换到前台运行 bg:运行后台挂起进程，例如bg">
 <meta property="og:locale">
 <meta property="article:published_time" content="2020-05-12T07:51:35.000Z">
 <meta property="article:modified_time" content="2020-08-07T09:14:20.846Z">
@@ -93,7 +93,7 @@ ga('send', 'pageview');
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
   
 
-<meta name="generator" content="Hexo 5.2.0"><style>mjx-container[jax="SVG"] {
+<meta name="generator" content="Hexo 5.4.2"><style>mjx-container[jax="SVG"] {
   direction: ltr;
 }
 
@@ -271,7 +271,7 @@ mjx-container[display="true"] + br {
 
   <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Process-Management"><span class="toc-text">Process Management</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Basic-Process-Management"><span class="toc-text">Basic Process Management</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Background-jobs"><span class="toc-text">Background jobs</span></a></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#process-management"><span class="toc-text">Process Management</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#basic-process-management"><span class="toc-text">Basic Process Management</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#background-jobs"><span class="toc-text">Background jobs</span></a></li></ol></li></ol>
   </div>
 
 
@@ -317,14 +317,17 @@ mjx-container[display="true"] + br {
 
   <div class="article-content">
     
-      <h3 id="Process-Management"><a href="#Process-Management" class="headerlink" title="Process Management"></a>Process Management</h3><h4 id="Basic-Process-Management"><a href="#Basic-Process-Management" class="headerlink" title="Basic Process Management"></a>Basic Process Management</h4><ul>
+      <h3 id="process-management">Process Management</h3>
+<h4 id="basic-process-management">Basic Process Management</h4>
+<ul>
 <li>$$ — 当期那进程PID</li>
 <li>$PPID — 父进程PID</li>
 <li>ps fx:查看当前bash的进程树</li>
 <li>ps fax:查看整个系统进程树</li>
 <li>pgrep 查看进程ID</li>
 </ul>
-<h4 id="Background-jobs"><a href="#Background-jobs" class="headerlink" title="Background jobs"></a>Background jobs</h4><ul>
+<h4 id="background-jobs">Background jobs</h4>
+<ul>
 <li>jobs:查看后台运行进程</li>
 <li>fg:将后台进程转换到前台运行</li>
 <li>bg:运行后台挂起进程，例如bg 1，运行后台第一个进程</li>
